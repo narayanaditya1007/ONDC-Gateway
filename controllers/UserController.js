@@ -9,6 +9,12 @@ require('dotenv').config();
 async function signup(req,res){
     try{
         console.log("hello");
+        const existUser = await User.findOne({email:req.body.email});
+        if(existUser){
+            console.log("user exists");
+            res.send("Email already exists, Try loggin in")
+            throw new Error("Email already exists, Try loggin in")
+        }
         const hashPass = await bcrypt.hash(req.body.password,10);
         const myId = new mongoose.Types.ObjectId();
         const user = new User({
