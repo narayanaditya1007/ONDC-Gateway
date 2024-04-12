@@ -50,6 +50,15 @@ async function signup(req,res){
     }
 }
 
+async function logout(req,res){
+    try{
+        res.clearCookie('jwtToken').send("Logout Done")
+    }
+    catch(err){
+        console.log(err);
+    }
+}
+
 async function login(req,res){
     try{
         console.log("i reached login")
@@ -169,6 +178,7 @@ async function getBuyer(req,res){
 module.exports = {
     signup,
     login,
+    logout,
     updateDetails,
     approveUser,
     removeUser,
