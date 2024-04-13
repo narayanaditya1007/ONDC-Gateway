@@ -77,9 +77,13 @@ async function login(req,res){
             res.send("Incorrect Password");
             throw new Error("Incorrect Password");
         }
-        if(!user.is_approved){
+        if(user.is_approved === undefined){
             res.send(" You are not approved, Wait or your approval");
             throw new Error("Not approved")
+        }
+        else if(user.is_approved === false){
+            res.send("Your registration is rejected")
+            throw new Error("Rejected")
         }
 
 
@@ -148,11 +152,11 @@ async function removeUser(req,res){
 async function getSeller(req,res){
     try{
         const allSeller = await User.find({user_type: "seller"});
-        allSeller.sort((seller1,seller2)=>{
-            if(seller1.is_approved)return false;
-            return true;
+        pendingSeller = allSeller.filter((seller)=>{
+            if(seller.is_approved === undefined)return true;
         })
-        res.send(allSeller);
+        
+        res.send(pendingSeller);
     }
     catch(err){
         console.log(err);
@@ -161,12 +165,23 @@ async function getSeller(req,res){
 
 async function getBuyer(req,res){
     try{
-        const allSeller = await User.find({user_type: "buyer"});
-        allSeller.sort((seller1,seller2)=>{
-            if(seller1.is_approved)return false;
-            return true;
-        })
+        const allBuyer = await User.find({user_type: "buyer"});
         res.send(allSeller);
+        pendingBuyer = allBuyer.filter((seller)=>{
+            if(seller.is_approved === undefined)return true;
+        })
+        
+        res.send(pendingBuyer);
+    }
+    catch(err){
+        console.log(err);
+    }
+}
+
+async function existingUser(req,res){
+    try{
+        const existing = await User.find({is_approved:"true"});
+        res.send(existing);
     }
     catch(err){
         console.log(err);
@@ -183,6 +198,7 @@ module.exports = {
     approveUser,
     removeUser,
     getSeller,
-    getBuyer
+    getBuyer,
+    existingUser
 
 }

@@ -1,58 +1,56 @@
 const Ecommerce = require('../models/Ecommerces');
 const User = require('../models/Users')
+const Redis = require('redis')
+
+
+const DEFAULTEXP = 3600;
 
 async function searchProduct(req,res){
     try{
-        let allProduct=[];
-        const platforms =await Ecommerce.find();
-        // console.log(platforms);
-        // platforms.forEach(function(platform){
-        //   console.log(platform.domain);
-        //   console.log(platform.getProduct);
-        // })
+      // const redisClient = Redis.createClient();
+      // await redisClient.connect();
+      // console.log("connected to redis")
 
-      await Promise.all(platforms.map(async (platform)=>{
-        if(platform.is_approved){
-          const domain = platform.domain;
-          const route = platform.getProduct;
-          console.log(domain);
-          // console.log(route);
-          const response = await fetch(domain+route, {
-              method: "GET",
-              headers: {
-              "Content-type": "application/json; charset=UTF-8"
-              }
-          })
-          const products =await response.json();
-          products.forEach(product => {
-            product.platformId = platform.platform_id;
-          });
-          // console.log(products);
-          allProduct = [...products,...allProduct];
-      }
-    }))
-
-        // await platforms.forEach(async function(platform) {
-        //     if(platform.is_approved){
-        //       const domain = platform.domain;
-        //       const route = platform.getProduct;
-        //       console.log(domain);
-        //       // console.log(route);
-        //       const response = await fetch(domain+route, {
-        //           method: "GET",
-        //           headers: {
-        //           "Content-type": "application/json; charset=UTF-8"
-        //           }
-        //       })
-        //       const products =await response.json();
-        //       // console.log(products);
-        //       allProduct = [...products,...allProduct];
-        //       // console.log(allProduct);
-        //   }
-        //   // console.log(allProduct);
-        // })
-        console.log(allProduct)
-        res.send(allProduct);
+      // const product = await redisClient.get("allProducts");
+      // if(product){
+      //   res.json(JSON.parse(product));
+      // }
+      // else{
+      //   try{
+            let allProduct=[];
+            const platforms =await Ecommerce.find();
+            await Promise.all(platforms.map(async (platform)=>{
+              if(platform.is_approved && platform.domain){
+                const domain = platform.domain;
+                const route = platform.getProduct;
+                const user = await User.findById(platform.platform_id);
+                const token = user.token
+                console.log(domain);
+                // console.log(route);
+                const response = await fetch(domain+route, {
+                    method: "GET",
+                    headers: {
+                      "Authorization": "Bearer "+token,
+                    "Content-type": "application/json; charset=UTF-8"
+                    }
+                })
+                const products =await response.json();
+                products.forEach(product => {
+                  product.platformId = platform.platform_id;
+                });
+                // console.log(products);
+                allProduct = [...products,...allProduct];
+            }
+          }))
+          // await redisClient.setEx("allProducts",DEFAULTEXP,JSON.stringify(allProduct))
+          console.log(allProduct)
+          res.send(allProduct);
+      //   }
+      //   catch(err){
+      //     console.log(err);
+      //   }
+      // }
+        
     }
     catch(err){
         console.log(err);
@@ -65,6 +63,8 @@ async function placeOrder(req,res){
         const platform =await Ecommerce.findOne({platform_id:req.body.platformId});
         const domain = platform.domain;
         const route = platform.placeOrder;
+        const user = await User.findById(platform.platform_id);
+        const token = user.token
         console.log(domain, route);
         const response = await fetch(domain+route, {
             method: "POST",
@@ -75,6 +75,7 @@ async function placeOrder(req,res){
               address: req.body.address
             }),
             headers: {
+              "Authorization": "Bearer "+token,
               "Content-type": "application/json; charset=UTF-8"
             }
           })
@@ -92,12 +93,15 @@ async function cancelOrder(req,res){
         const platform =await Ecommerce.findOne({platform_id:req.body.platformId});
         const domain = platform.domain;
         const route = platform.cancelOrder;
+        const user = await User.findById(platform.platform_id);
+        const token = user.token
         const response = await fetch(domain+route, {
             method: "PUT",
             body: JSON.stringify({
               itemId: req.body.itemId,
             }),
             headers: {
+              "Authorization": "Bearer "+token,
               "Content-type": "application/json; charset=UTF-8"
             }
           })
@@ -115,12 +119,15 @@ async function getReview(req,res){
         const platform =await Ecommerce.findOne({platform_id:req.body.platformId});
         const domain = platform.domain;
         const route = platform.getReview;
+        const user = await User.findById(platform.platform_id);
+        const token = user.token
         console.log(req.params);
         const url = domain+route+'/'+req.body.productId;
         console.log(url);
         const response = await fetch(url, {
             method: "GET",         
             headers: {
+              "Authorization": "Bearer "+token,
               "Content-type": "application/json; charset=UTF-8"
             }
           })
@@ -137,6 +144,7 @@ async function addReview(req,res){
     try{
         const platform =await Ecommerce.findOne({platform_id:req.body.platformId});
         const user=await User.findById(req.body.UserId)
+        const token = user.token;
         const domain = platform.domain;
         const route = platform.getReview;
         console.log(domain,route);
@@ -149,6 +157,7 @@ async function addReview(req,res){
               userName: req.body.name
             }),
             headers: {
+              "Authorization": "Bearer "+token,
               "Content-type": "application/json; charset=UTF-8"
             }
           })

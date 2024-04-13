@@ -25,6 +25,10 @@ Router.get('/user/getSeller',authenticate_login,isAdmin,User_controller.getSelle
 // get buyers
 Router.get('/user/getBuyer',authenticate_login,isAdmin,User_controller.getBuyer);
 
+
+// get existring applications
+Router.get('/user/existing',authenticate_login,isAdmin,User_controller.existingUser);
+
 // approve 
 Router.put('/user/approve',authenticate_login,isAdmin,User_controller.approveUser);
 
