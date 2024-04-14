@@ -7,16 +7,16 @@ const DEFAULTEXP = 3600;
 
 async function searchProduct(req,res){
     try{
-      // const redisClient = Redis.createClient();
-      // await redisClient.connect();
-      // console.log("connected to redis")
+      const redisClient = Redis.createClient();
+      await redisClient.connect();
+      console.log("connected to redis")
 
-      // const product = await redisClient.get("allProducts");
-      // if(product){
-      //   res.json(JSON.parse(product));
-      // }
-      // else{
-      //   try{
+      const product = await redisClient.get("allProducts");
+      if(product){
+        res.json(JSON.parse(product));
+      }
+      else{
+        try{
             let allProduct=[];
             const platforms =await Ecommerce.find();
             await Promise.all(platforms.map(async (platform)=>{
@@ -42,14 +42,14 @@ async function searchProduct(req,res){
                 allProduct = [...products,...allProduct];
             }
           }))
-          // await redisClient.setEx("allProducts",DEFAULTEXP,JSON.stringify(allProduct))
+          await redisClient.setEx("allProducts",DEFAULTEXP,JSON.stringify(allProduct))
           console.log(allProduct)
           res.send(allProduct);
-      //   }
-      //   catch(err){
-      //     console.log(err);
-      //   }
-      // }
+        }
+        catch(err){
+          console.log(err);
+        }
+      }
         
     }
     catch(err){
