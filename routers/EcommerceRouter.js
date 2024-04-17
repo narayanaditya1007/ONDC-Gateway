@@ -11,6 +11,9 @@ Router.get('/commerce/searchProduct',authorizeBuyer,Commerce_controller.searchPr
 // place order
 Router.post('/commerce/placeOrder',authorizeBuyer,Commerce_controller.placeOrder)
 
+// get Order details
+Router.get('/commerce/order/:platformId/:orderId',authorizeBuyer,Commerce_controller.getOrderDetail)
+
 // cancel order --buyer
 Router.put('/commerce/cancelOrder',authorizeBuyer,Commerce_controller.cancelOrder)
 

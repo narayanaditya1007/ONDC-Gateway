@@ -5,6 +5,7 @@ const EcommerceSchema = mongoose.Schema({
     is_approved:Boolean,
     domain: String,
     getProduct:String,
+    getOrder:String,
     placeOrder:String,
     cancelOrder:String,
     getReview:String,
