@@ -154,7 +154,7 @@ async function getSeller(req,res){
     try{
         const allSeller = await User.find({user_type: "seller"});
         pendingSeller = allSeller.filter((seller)=>{
-            if(seller.is_approved === undefined)return true;
+            if(seller.is_approved === undefined || seller.is_approved===true)return true;
         })
         
         res.send(pendingSeller);
@@ -167,8 +167,8 @@ async function getSeller(req,res){
 async function getBuyer(req,res){
     try{
         const allBuyer = await User.find({user_type: "buyer"});
-        pendingBuyer = allBuyer.filter((seller)=>{
-            if(seller.is_approved === undefined)return true;
+        pendingBuyer = allBuyer.filter((buyer)=>{
+            if(buyer.is_approved === undefined || buyer.is_approved===true)return true;
         })
         
         res.send(pendingBuyer);
