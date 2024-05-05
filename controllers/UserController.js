@@ -24,7 +24,7 @@ async function signup(req,res){
             password: hashPass,
             phone: req.body.phone,
             user_type: req.body.userType,
-            is_approved: false,
+            is_approved: undefined,  
         });
         console.log(user)
         if(req.body.userType == 'seller'){
@@ -36,7 +36,8 @@ async function signup(req,res){
                 placeOrder:req.body.placeOrder,
                 cancelOrder:req.body.cancelOrder,
                 getReview:req.body.getReview,
-                addReview:req.body.addReview
+                addReview:req.body.addReview,
+                getIndivisualProduct:req.body.getIndivisualProduct
             })
 
             await ecommerce.save();
@@ -68,7 +69,7 @@ async function login(req,res){
             res.send("User not found")
             throw new Error("User not found");
         }
-        // console.log("111");
+        console.log("111");
         console.log(req.body.password);
         console.log(user.password)
         const isMatch = await bcrypt.compare(req.body.password,user.password);
@@ -166,7 +167,6 @@ async function getSeller(req,res){
 async function getBuyer(req,res){
     try{
         const allBuyer = await User.find({user_type: "buyer"});
-        res.send(allSeller);
         pendingBuyer = allBuyer.filter((seller)=>{
             if(seller.is_approved === undefined)return true;
         })

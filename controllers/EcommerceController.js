@@ -58,6 +58,30 @@ async function searchProduct(req,res){
     }
 }
 
+async function getProduct(req,res){
+  try{
+    const platform =await Ecommerce.findOne({platform_id:req.params.platformId});
+    const domain = platform.domain;
+    const route = platform.getIndivisualProduct.replace(':productId',req.params.productId);
+
+    const user = await User.findById(platform.platform_id);
+    const token = user.token;
+    console.log(domain, route);
+    const response = await fetch(domain+route,{
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer "+token,
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      })
+    const product = await response.json();
+    res.send(product)
+  }
+  catch(err){
+    console.log(err);
+  }
+}
+
 async function placeOrder(req,res){
     try{
         const platform =await Ecommerce.findOne({platform_id:req.body.platformId});
@@ -202,5 +226,6 @@ module.exports = {
     getOrderDetail,
     cancelOrder,
     getReview,
-    addReview
+    addReview,
+    getProduct
 }

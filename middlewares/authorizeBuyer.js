@@ -4,7 +4,10 @@ const jwt = require("jsonwebtoken")
 
 const authorizeBuyer = async (req,res,next)=>{
    try{ 
+        
         const token = req.header('Authorization').replace('Bearer ','');
+        
+        console.log(token);
         const decoded = jwt.verify(token,process.env.SECRET_KEY);
         console.log(decoded.userId);
         req.body.UserId= decoded.userId;

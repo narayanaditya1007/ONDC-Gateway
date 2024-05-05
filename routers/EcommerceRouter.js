@@ -8,6 +8,9 @@ const Router = express.Router();
 // get search product
 Router.get('/commerce/searchProduct',authorizeBuyer,Commerce_controller.searchProduct)
 
+// get particular product
+Router.get('/commerce/:platformId/:productId',authorizeBuyer,Commerce_controller.getProduct)
+
 // place order
 Router.post('/commerce/placeOrder',authorizeBuyer,Commerce_controller.placeOrder)
 
