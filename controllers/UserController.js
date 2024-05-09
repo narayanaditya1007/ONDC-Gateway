@@ -37,7 +37,8 @@ async function signup(req,res){
                 cancelOrder:req.body.cancelOrder,
                 getReview:req.body.getReview,
                 addReview:req.body.addReview,
-                getIndivisualProduct:req.body.getIndivisualProduct
+                getIndivisualProduct:req.body.getIndivisualProduct,
+                getOrder:req.body.getOrder
             })
 
             await ecommerce.save();
